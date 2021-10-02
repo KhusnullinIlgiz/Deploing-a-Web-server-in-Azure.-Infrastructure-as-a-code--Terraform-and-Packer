@@ -35,7 +35,7 @@ variable "subnet_addr_space"{
 
 variable "num_vms"{
   description = "by adjusting this variable -> number of VM's will be regulated"
-  default = 1
+  default = 3
   type = number
 }
 
