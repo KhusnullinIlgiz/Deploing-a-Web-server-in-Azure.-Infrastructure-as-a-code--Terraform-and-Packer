@@ -36,7 +36,7 @@ resource "azurerm_network_security_group" "main"{
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
-#Allow traffic within V-NET rule
+#Allow traffic from Load Balancer V-NET rule
   security_rule {
     name                       = "allowAllV-NET"
     priority                   = 100
@@ -44,23 +44,12 @@ resource "azurerm_network_security_group" "main"{
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.virtual_network_addr_space[0]
-    destination_address_prefix = var.virtual_network_addr_space[0]
-  }
-
-  #Deny traffic from Internet rule
-  security_rule {
-    name                       = "DenyAllInternet"
-    priority                   = 101
-    direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
+    destination_port_range     = "8080"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+
   tags = {
     environment = var.environment
   }
@@ -134,7 +123,7 @@ resource "azurerm_lb_probe" "main" {
   resource_group_name = azurerm_resource_group.main.name
   loadbalancer_id     = azurerm_lb.main.id
   name                = "${var.prefix}-lbprobe"
-  port                = 80
+  port                = 8080
 
 }
 
@@ -145,7 +134,7 @@ resource "azurerm_lb_rule" "main" {
   name                           = "${var.prefix}-lbrule"
   protocol                       = "TCP"
   frontend_port                  = 80
-  backend_port                   = 80
+  backend_port                   = 8080
   frontend_ip_configuration_name = "${var.prefix}-PublicIP"
   backend_address_pool_id        = azurerm_lb_backend_address_pool.main.id
   probe_id                       = azurerm_lb_probe.main.id
