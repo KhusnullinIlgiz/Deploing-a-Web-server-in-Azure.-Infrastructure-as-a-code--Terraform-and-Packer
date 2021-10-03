@@ -84,8 +84,8 @@ resource "azurerm_network_security_group" "main"{
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "8080"
-    source_address_prefix      = var.virtual_network_addr_space[0]
-    destination_address_prefix = var.virtual_network_addr_space[0]
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 
 
