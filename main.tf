@@ -36,17 +36,56 @@ resource "azurerm_network_security_group" "main"{
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
-#Allow traffic from Load Balancer V-NET rule
+#Deny all traffic from Internet
   security_rule {
-    name                       = "allowAllV-NET"
+    name                       = "denyAllV-NET"
+    priority                   = 500
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80 - 843"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+#Allow inside traffic inside V-NET
+  security_rule {
+    name                       = "allowAllV-NET-inside"
     priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.virtual_network_addr_space[0]
+    destination_address_prefix = var.virtual_network_addr_space[0]
+  }
+
+  #Allow outside traffic V-NET
+  security_rule {
+    name                       = "allowAllV-NET-outside"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.virtual_network_addr_space[0]
+    destination_address_prefix = var.virtual_network_addr_space[0]
+  }
+
+  #Allow HTTP load balancer inside traffic V-NET
+  security_rule {
+    name                       = "allowAllV-NET-lb"
+    priority                   = 102
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "8080"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    source_address_prefix      = var.virtual_network_addr_space[0]
+    destination_address_prefix = var.virtual_network_addr_space[0]
   }
 
 
